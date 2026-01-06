@@ -1,5 +1,4 @@
 import ServerNavbar from "@/components/ui/server-navbar";
-import DOMPurify from "isomorphic-dompurify";
 import { getServiceSupabase } from "@/lib/supabase";
 import { MailData } from "@/lib/types";
 import Link from "next/link";
@@ -10,6 +9,25 @@ export const revalidate = 0; // always render server-side with fresh data
 export const dynamic = "force-dynamic";
 
 const isLikelyHtml = (body: string) => /<\/?[a-z][\s\S]*>/i.test(body.trim());
+
+const sanitizeHtml = (dirty: string): string => {
+    if (!dirty) return "";
+
+    let cleaned = dirty;
+
+    // Remove <script> blocks
+    cleaned = cleaned.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "");
+
+    // Remove inline event handler attributes (onclick, onerror, etc.)
+    cleaned = cleaned.replace(/\son\w+\s*=\s*"(.*?)"/gi, "");
+    cleaned = cleaned.replace(/\son\w+\s*=\s*'(.*?)'/gi, "");
+
+    // Remove javascript: URLs
+    cleaned = cleaned.replace(/href\s*=\s*"(javascript:[^"]*)"/gi, 'href="#"');
+    cleaned = cleaned.replace(/href\s*=\s*'(javascript:[^']*)'/gi, "href='#'");
+
+    return cleaned;
+};
 
 const fetchMail = async (mailId: string): Promise<MailData | null> => {
     const supabase = getServiceSupabase();
@@ -48,10 +66,7 @@ const MailPage = async ({
     }
 
     const htmlBody = isLikelyHtml(mail.body);
-    const sanitizedHtml = htmlBody
-        ? DOMPurify.sanitize(mail.body, { USE_PROFILES: { html: true } })
-        : "";
-
+    const sanitizedHtml = htmlBody ? sanitizeHtml(mail.body) : "";
     return (
         <>
         <ServerNavbar />
