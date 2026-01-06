@@ -1,4 +1,5 @@
 import { getServiceSupabase } from "@/lib/supabase";
+import { SendMailRequestBody } from "@/lib/types";
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
@@ -40,7 +41,24 @@ export const POST = async (req: NextRequest) => {
             })
         }
 
-        const { subject, isHTML, from, to, data } = await req.json();
+        const { subject, isHTML, senderName, from, to, data } = await req.json();
+
+        const { success } = SendMailRequestBody.safeParse({
+            subject,
+            isHTML,
+            senderName,
+            from,
+            to,
+            data
+        })
+
+        if (!success) {
+            return NextResponse.json({
+                message: "Invalid Request"
+            },{
+                status: 400
+            })
+        }
 
         const mailtransport = nodemailer.createTransport({
             service: "smtp",
@@ -56,7 +74,7 @@ export const POST = async (req: NextRequest) => {
         let info;
         if (isHTML) {
             info = await mailtransport.sendMail({
-                from,
+                from: `"${senderName}" <${from}>`,
                 to,
                 subject,
                 html: data
@@ -64,7 +82,7 @@ export const POST = async (req: NextRequest) => {
         }
         else {
             info = await mailtransport.sendMail({
-                from,
+                from: `"${senderName}" <${from}>`,
                 to,
                 subject,
                 text: data

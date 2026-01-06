@@ -14,7 +14,7 @@ import {
     FieldSet,
     FieldTitle,
 } from "@/components/ui/field";
-import { Button } from "@/components/button";
+import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -91,7 +91,8 @@ const SendPage = () => {
         try {
             setIsSubmitting(true);
             const { data } = await axios.post("/api/sendmail", {
-                from: `"${senderName}" <${from}>`,
+                from,
+                senderName,
                 to,
                 subject,
                 isHTML: bodyType == "html",

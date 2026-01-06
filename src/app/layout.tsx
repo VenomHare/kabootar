@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import {
   Architects_Daughter,
   Fira_Code,
-  Geist,
-  Geist_Mono,
   Noto_Sans_Georgian,
 } from "next/font/google";
 import "./globals.css";

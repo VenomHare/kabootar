@@ -1,3 +1,4 @@
+import z from 'zod' 
 export interface DisplayMail { 
     id: string,
     from : string,
@@ -5,11 +6,15 @@ export interface DisplayMail {
     subject: string,
     sent_at: string
 }
-export interface MailData { 
-    id: string,
-    from : string,
-    to: string,
-    subject: string,
+export interface MailData extends DisplayMail { 
     body: string,
-    sent_at: string
 }
+
+export const SendMailRequestBody = z.object({
+    to: z.email(),
+    from: z.email(),
+    senderName: z.string().min(1),
+    subject: z.string(),
+    isHTML: z.boolean(),
+    data: z.string()
+})

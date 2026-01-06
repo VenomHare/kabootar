@@ -1,9 +1,10 @@
 import ServerNavbar from "@/components/ui/server-navbar";
+import DOMPurify from "isomorphic-dompurify";
 import { getServiceSupabase } from "@/lib/supabase";
 import { MailData } from "@/lib/types";
-import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ChevronLeft } from "lucide-react";
 
 export const revalidate = 0; // always render server-side with fresh data
 export const dynamic = "force-dynamic";
@@ -48,7 +49,7 @@ const MailPage = async ({
 
     const htmlBody = isLikelyHtml(mail.body);
     const sanitizedHtml = htmlBody
-        ? mail.body.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "")
+        ? DOMPurify.sanitize(mail.body, { USE_PROFILES: { html: true } })
         : "";
 
     return (
