@@ -21,6 +21,7 @@ const archDaughter = Architects_Daughter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://kabootar.draftmymail.com"),
   title: "Kabootar",
   description: "Mail Sending App",
   icons: {
@@ -34,6 +35,7 @@ export const metadata: Metadata = {
     images: ["/logo.png"],
   },
 };
+
 
 export default function RootLayout({
   children,
